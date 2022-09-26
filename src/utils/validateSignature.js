@@ -1,5 +1,5 @@
-import ethUtil from "ethereumjs-util";
-import sigUtil from "eth-sig-util";
+import { bufferToHex } from "ethereumjs-util";
+import { recoverPersonalSignature } from "eth-sig-util";
 import Account from "../models/account";
 
 const validateSignature = async (publicKey, signature) => {
@@ -8,8 +8,8 @@ const validateSignature = async (publicKey, signature) => {
     let account = await Account.findOne({ address: publicKey });
     let nonce = account.nonce;
     let msg = `Approve Signature on Crypto Space Invaders with nonce ${nonce}`;
-    let msgBufferHex = ethUtil.bufferToHex(Buffer.from(msg, "utf8"));
-    let address = sigUtil.recoverPersonalSignature({
+    let msgBufferHex = bufferToHex(Buffer.from(msg, "utf8"));
+    let address = recoverPersonalSignature({
       data: msgBufferHex,
       sig: signature,
     });

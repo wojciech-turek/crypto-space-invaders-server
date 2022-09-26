@@ -14,7 +14,7 @@ const getToken = async (req, res) => {
     const address = req.body.address;
     const signature = req.body.signature;
     if (!ethers.utils.isAddress(address)) {
-      return res.json({
+      return res.status(400).json({
         status: "failed",
         data: "invalid address",
       });
@@ -24,7 +24,7 @@ const getToken = async (req, res) => {
     const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
     const code = await provider.getCode(address);
     if (code !== "0x") {
-      return res.json({
+      return res.status(400).json({
         status: "failed",
         data: "invalid address",
       });
@@ -52,13 +52,13 @@ const getToken = async (req, res) => {
         token,
       });
     } else {
-      return res.json({
+      return res.status(400).json({
         status: "failed",
         data: "invalid signature",
       });
     }
   } catch (error) {
-    return res.json({
+    return res.status(400).json({
       status: "failed",
       data: error.message,
     });
