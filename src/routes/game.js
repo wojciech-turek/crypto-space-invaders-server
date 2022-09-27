@@ -4,16 +4,16 @@ import Account from "../models/account";
 import Game from "../models/game";
 import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
+import auth from "../middleware/auth";
 
 const router = Router();
 
 // on new game creation send game id to the client
-router.get("/start", async (req, res) => {
+router.post("/start", auth, async (req, res) => {
   const address = extractAddress(req, res);
   const signature = req.body.signature;
 
   let isValidsignature = await validateSignature(address, signature);
-
   if (!isValidsignature)
     return res.status(400).json({
       status: "invalid signature",
@@ -42,6 +42,42 @@ router.get("/start", async (req, res) => {
   res.send({
     gameId: gameId,
     message: "Game created!",
+  });
+});
+
+router.post("/end", async (req, res) => {
+  const gameId = req.body.gameId;
+  const score = req.body.score;
+  const address = extractAddress(req, res);
+  const game = await Game.findOne({ id: gameId });
+  if (!game) {
+    return res.status(400).json({
+      status: "failed",
+      data: "invalid game id",
+    });
+  }
+  if (game.ended) {
+    return res.status(400).json({
+      status: "failed",
+      data: "game already ended",
+    });
+  }
+  if (game.creatorAddress != address) {
+    return res.status(400).json({
+      status: "failed",
+      data: "invalid address",
+    });
+  }
+
+  // save the score on the blockchain
+
+  game.ended = true;
+  game.score = score;
+  await game.save();
+  return res.json({
+    gameId: gameId,
+    status: "success",
+    data: "game ended",
   });
 });
 

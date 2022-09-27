@@ -1,10 +1,11 @@
 import { bufferToHex } from "ethereumjs-util";
 import { recoverPersonalSignature } from "eth-sig-util";
 import Account from "../models/account";
+import lodash from "lodash";
 
 const validateSignature = async (publicKey, signature) => {
   try {
-    publicKey = toLowerCase(publicKey);
+    publicKey = lodash.toLower(publicKey);
     let account = await Account.findOne({ address: publicKey });
     let nonce = account.nonce;
     let msg = `Approve Signature on Crypto Space Invaders with nonce ${nonce}`;
@@ -13,7 +14,7 @@ const validateSignature = async (publicKey, signature) => {
       data: msgBufferHex,
       sig: signature,
     });
-    if (toLowerCase(address) == publicKey) {
+    if (lodash.toLower(address) == publicKey) {
       account.nonce = Math.floor(Math.random() * 9999999);
       await account.save();
       return true;

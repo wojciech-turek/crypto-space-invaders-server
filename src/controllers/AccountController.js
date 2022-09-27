@@ -1,4 +1,7 @@
+import { ethers } from "ethers";
 import mongoose from "mongoose";
+import extractAddress from "../utils/extractAddress";
+
 const Account = mongoose.model("Account");
 
 const getNonce = async (req, res) => {
