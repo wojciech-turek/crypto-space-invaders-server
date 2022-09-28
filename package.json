@@ -4,7 +4,8 @@
   "description": "Server for crypto space invaders game",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node src/app.js",
+    "dev": "nodemon --exec babel-node src/app.js",
+    "start": "src/app.js",
     "test": "test"
   },
   "repository": {
