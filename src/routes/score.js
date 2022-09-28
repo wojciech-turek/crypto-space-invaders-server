@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
   const topScores = await Game.find({ ended: true, score: { $gt: 0 } })
     .sort({ score: -1 })
     .limit(10)
-    .select("score", "creatorAddress");
+    .select(["score", "creatorAddress"]);
   res.send(topScores);
 });
 
