@@ -1,19 +1,14 @@
 import { Router } from "express";
+import Game from "../models/game";
 
 const router = Router();
 
-// validate signature
-// validate score
-// save score
-
-// highscores are saved in the smart contract
-// high scores are kep in the client as well
-
-// at the end of the leage we want to check if score tables match in the client and in the smart contract
-// if the is a discrepancy we need to resolve it
-router.get("/save", async (req, res) => {
-  // verify signature with the signature used to create game
-  res.send("Score saved!");
+router.get("/", async (req, res) => {
+  // get 10 games from the database with the highest score
+  const topScores = await Game.find({ ended: true, score: { $gt: 0 } })
+    .sort({ score: -1 })
+    .limit(10);
+  res.send(topScores);
 });
 
 export default router;

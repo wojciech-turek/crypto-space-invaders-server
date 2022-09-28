@@ -5,6 +5,8 @@ import Game from "../models/game";
 import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
+import rpcProvider from "../contract/provider";
+import shooterContract from "../contract/shooter-contract";
 
 const router = Router();
 
@@ -69,6 +71,13 @@ router.post("/end", async (req, res) => {
     });
   }
 
+  // get high score from the smart contract
+  const highestScore = await shooterContract.highestScore();
+  if (score > highestScore) {
+    // update high score in the smart contract
+    const tx = await shooterContract.setHighestScore(score, address);
+    await tx.wait();
+  }
   // save the score on the blockchain
 
   game.ended = true;
