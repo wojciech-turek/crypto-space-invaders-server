@@ -5,7 +5,6 @@ import Game from "../models/game";
 import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
-import rpcProvider from "../contract/provider";
 import shooterContract from "../contract/shooter-contract";
 
 const router = Router();
