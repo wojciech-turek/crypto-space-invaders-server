@@ -28,12 +28,15 @@ router.post("/start", auth, async (req, res) => {
   account.gamesPlayed += 1;
   await account.save();
 
+  const currentLeague = await shooterContract.leagueNumber();
+
   const gameId = uuidv4();
   // create game
   const newGame = new Game({
     id: gameId,
     ended: false,
     creatorAddress: address,
+    leagueNumber: currentLeague,
     signature: signature,
     createdAt: Date.now(),
   });
@@ -81,6 +84,7 @@ router.post("/end", async (req, res) => {
 
   game.ended = true;
   game.score = score;
+
   await game.save();
   return res.json({
     gameId: gameId,

@@ -13,6 +13,10 @@ const gameSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  leagueNumber: {
+    type: Number,
+    required: true,
+  },
   score: {
     type: Number,
   },
