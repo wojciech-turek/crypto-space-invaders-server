@@ -84,10 +84,18 @@ router.post("/end", async (req, res) => {
 
   game.ended = true;
   game.score = score;
-
   await game.save();
+
+  // get all games and calculate rank for current league
+  const currentLeague = await shooterContract.leagueNumber();
+
+  const games = await Game.find({ leagueNumber: currentLeague });
+  const sortedGames = games.sort((a, b) => b.score - a.score);
+  const rank = sortedGames.findIndex((game) => game.id == gameId) + 1;
+
   return res.json({
     gameId: gameId,
+    rank: rank,
     status: "success",
     data: "game ended",
   });
