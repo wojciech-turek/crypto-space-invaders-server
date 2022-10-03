@@ -6,6 +6,7 @@ import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
 import shooterContract from "../contract/shooter-contract";
+import rpcProvider from "../contract/provider";
 
 const router = Router();
 
@@ -73,18 +74,29 @@ router.post("/end", async (req, res) => {
     });
   }
 
+  game.ended = true;
+  game.score = parseInt(score);
+  await game.save();
+
   // get high score from the smart contract
   const highestScore = await shooterContract.highestScore();
   if (score > highestScore) {
     // update high score in the smart contract
-    const tx = await shooterContract.setHighestScore(score, address);
-    await tx.wait();
+    const feeData = await rpcProvider.getFeeData();
+    // add 40% to the gas price
+    const gasPrice = feeData.gasPrice.mul(2);
+    try {
+      const tx = await shooterContract.setHighestScore(score, address, {
+        gasPrice,
+      });
+      await tx.wait();
+    } catch {
+      return res.status(400).json({
+        status: "failed",
+        data: "failed to update high score",
+      });
+    }
   }
-  // save the score on the blockchain
-
-  game.ended = true;
-  game.score = parseInt(score);
-  await game.save();
 
   // get all games and calculate rank for current league
   const currentLeague = await shooterContract.leagueNumber();
