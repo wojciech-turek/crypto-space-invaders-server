@@ -83,13 +83,13 @@ router.post("/end", async (req, res) => {
   // save the score on the blockchain
 
   game.ended = true;
-  game.score = score;
+  game.score = parseInt(score);
   await game.save();
 
   // get all games and calculate rank for current league
   const currentLeague = await shooterContract.leagueNumber();
 
-  const games = await Game.find({ leagueNumber: currentLeague });
+  const games = await Game.find({ leagueNumber: parseInt(currentLeague) });
   const sortedGames = games.sort((a, b) => b.score - a.score);
   const rank = sortedGames.findIndex((game) => game.id == gameId) + 1;
 
