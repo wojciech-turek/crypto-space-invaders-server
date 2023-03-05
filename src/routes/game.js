@@ -6,7 +6,6 @@ import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
 import shooterContract from "../contract/shooter-contract";
-import rpcProvider from "../contract/provider";
 import { ethers } from "ethers";
 
 const router = Router();
@@ -51,15 +50,6 @@ router.post("/start", auth, async (req, res) => {
   });
 });
 
-router.get("/test", async (req, res) => {
-  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-  const blockNum = await provider.getBlockNumber();
-  res.send({
-    message: "Game test!",
-    provider: blockNum,
-  });
-});
-
 router.post("/end", async (req, res) => {
   const gameId = req.body.gameId;
   const score = req.body.score;
@@ -89,24 +79,8 @@ router.post("/end", async (req, res) => {
   await game.save();
 
   // get high score from the smart contract
-  const highestScore = await shooterContract.highestScore();
-  if (score > highestScore) {
-    // update high score in the smart contract
-    const feeData = await rpcProvider.getFeeData();
-    // add 40% to the gas price
-    const gasPrice = feeData.gasPrice.mul(2);
-    try {
-      const tx = await shooterContract.setHighestScore(score, address, {
-        gasPrice,
-      });
-      await tx.wait();
-    } catch {
-      return res.status(400).json({
-        status: "failed",
-        data: "failed to update high score",
-      });
-    }
-  }
+
+  setHighScore(score, address);
 
   // get all games and calculate rank for current league
   const currentLeague = await shooterContract.leagueNumber();
@@ -124,3 +98,27 @@ router.post("/end", async (req, res) => {
 });
 
 export default router;
+
+async function setHighScore(score, address) {
+  const MAX_RETRIES = 5;
+  let retries = 0;
+  while (retries < MAX_RETRIES) {
+    const highestScore = await shooterContract.highestScore();
+    if (score > highestScore) {
+      try {
+        const tx = await shooterContract.setHighestScore(score, address);
+        await tx.wait();
+        return;
+      } catch {
+        retries += 1;
+      }
+    } else {
+      return;
+    }
+  }
+
+  return res.status(400).json({
+    status: "failed",
+    data: "failed to set high score",
+  });
+}
