@@ -7,6 +7,7 @@ import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
 import shooterContract from "../contract/shooter-contract";
 import rpcProvider from "../contract/provider";
+import { ethers } from "ethers";
 
 const router = Router();
 
@@ -51,8 +52,11 @@ router.post("/start", auth, async (req, res) => {
 });
 
 router.get("/test", async (req, res) => {
+  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+  const blockNum = await provider.getBlockNumber();
   res.send({
     message: "Game test!",
+    provider: blockNum,
   });
 });
 
