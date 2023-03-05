@@ -39,6 +39,7 @@ app.use("/score", routes.score);
 app.use("/game", routes.game);
 app.use("/account", routes.account);
 app.use("/auth", routes.auth);
+app.use("/data", routes.data);
 
 app.listen(process.env.PORT || 5000, () =>
   Logger.info(`Shooter app listening on port ${process.env.PORT}!`)
