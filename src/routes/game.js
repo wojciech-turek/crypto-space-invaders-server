@@ -50,6 +50,13 @@ router.post("/start", auth, async (req, res) => {
   });
 });
 
+router.get("/test", async (req, res) => {
+  const currentLeague = await shooterContract.leagueNumber();
+  res.send({
+    currentLeague: currentLeague,
+  });
+});
+
 router.post("/end", async (req, res) => {
   const gameId = req.body.gameId;
   const score = req.body.score;
