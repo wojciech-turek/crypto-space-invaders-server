@@ -19,17 +19,18 @@ const getToken = async (req, res) => {
     }
 
     // check if address is a wallet
-    const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL, {
-      name: "nahmii",
-      chainId: 4062,
-    });
-    const code = await provider.getCode(address);
-    if (code !== "0x") {
-      return res.status(400).json({
-        status: "failed",
-        data: "invalid address",
-      });
-    }
+
+    // const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL, {
+    //   name: "nahmii",
+    //   chainId: 4062,
+    // });
+    // const code = await provider.getCode(address);
+    // if (code !== "0x") {
+    //   return res.status(400).json({
+    //     status: "failed",
+    //     data: "invalid address",
+    //   });
+    // }
 
     const message = "Login/Regsiter to an account on Crypto Space Invaders";
     const msgBufferHex = bufferToHex(Buffer.from(message, "utf8"));
