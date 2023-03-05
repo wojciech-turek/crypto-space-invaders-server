@@ -51,9 +51,8 @@ router.post("/start", auth, async (req, res) => {
 });
 
 router.get("/test", async (req, res) => {
-  const currentLeague = await shooterContract.leagueNumber();
   res.send({
-    currentLeague: currentLeague,
+    message: "Game test!",
   });
 });
 
