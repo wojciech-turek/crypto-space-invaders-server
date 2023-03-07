@@ -6,7 +6,6 @@ import extractAddress from "../utils/extractAddress";
 import validateSignature from "../utils/validateSignature";
 import auth from "../middleware/auth";
 import shooterContract from "../contract/shooter-contract";
-import { ethers } from "ethers";
 
 const router = Router();
 
